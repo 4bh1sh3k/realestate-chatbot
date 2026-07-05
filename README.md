@@ -1,4 +1,4 @@
-# 🏠 Document RAG Chatbot (FastAPI + ChromaDB + Gemini)
+#  Document RAG Chatbot (FastAPI + ChromaDB + Gemini)
 
 This is a full-stack **Retrieval-Augmented Generation (RAG)** chatbot that I built as a personal learning project to understand semantic search, vector databases, and Large Language Model (LLM) integrations.
 
@@ -6,7 +6,7 @@ The project is designed to ingest local text documents (such as properties, comp
 
 ---
 
-## 🚀 How the RAG Pipeline Works
+##  How the RAG Pipeline Works
 
 This project implements a standard RAG workflow:
 1. **Document Chunking & Processing**: Documents are read, split into overlapping text chunks, and processed.
@@ -17,7 +17,7 @@ This project implements a standard RAG workflow:
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 *   **Backend**: Python, FastAPI (asynchronous REST API)
 *   **Vector Database**: ChromaDB (configured as a local persistent storage client)
@@ -26,7 +26,7 @@ This project implements a standard RAG workflow:
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```text
 ai-chatbot-py/
@@ -50,7 +50,7 @@ ai-chatbot-py/
 
 ---
 
-## ⚙️ Installation & Setup
+##  Installation & Setup
 
 ### 1. Prerequisites
 Make sure you have Python 3.10+ installed.
@@ -73,7 +73,7 @@ GEMINI_API_KEY=your_actual_gemini_api_key_here
 
 ---
 
-## 🏃 Running the Application
+##  Running the Application
 
 ### Step 1: Run the Ingestion Pipeline
 To populate the local vector database with your document listings, run:
