@@ -22,6 +22,7 @@ yarn-error.log*
 
 # Vector Database and local data stores
 chroma_db/
+backend/database/
 *.db
 *.sqlite
 

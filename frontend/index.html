@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apex Horizon Realty | Luxury & Modern Properties</title>
+    <!-- Google Fonts for premium typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="widget.css">
+</head>
+<body>
+
+    <!-- 1. Header & Navigation -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">
+                <i class="fa-solid fa-hotel logo-icon"></i>
+                <span>Apex Horizon</span>
+            </a>
+            <nav class="nav-menu">
+                <a href="#listings" class="nav-link">Properties</a>
+                <a href="#about" class="nav-link">About Us</a>
+                <a href="#services" class="nav-link">Services</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </nav>
+            <button class="nav-cta" onclick="toggleChat(true)">
+                <i class="fa-solid fa-comments"></i> Ask Assistant
+            </button>
+        </div>
+    </header>
+
+    <!-- 2. Hero Section -->
+    <section class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <span class="hero-tag">Welcome to Apex Horizon Realty</span>
+            <h1 class="hero-title">Find a home where your story begins.</h1>
+            <p class="hero-subtitle">Discover premium listings in exclusive neighborhoods. Ask our AI Assistant for recommendations in real-time.</p>
+            
+            <!-- Hero Search bar - Integrated with AI Chatbot! -->
+            <div class="search-bar-container">
+                <div class="search-input-wrapper">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="heroSearchInput" placeholder="Try asking: 'Show me 3-bedroom houses near schools under $500k'...">
+                </div>
+                <button class="search-btn" id="heroSearchBtn">Ask AI</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Featured Property Listings -->
+    <section class="listings-section" id="listings">
+        <div class="section-header">
+            <span class="section-tag">Current Inventory</span>
+            <h2 class="section-title">Featured Property Listings</h2>
+            <div class="accent-line"></div>
+        </div>
+
+        <div class="listings-grid">
+            <!-- Property 1 -->
+            <div class="property-card">
+                <div class="property-image-placeholder prop-img-townhouse">
+                    <span class="badge-price">$450,000</span>
+                    <span class="badge-tag">Near Schools</span>
+                </div>
+                <div class="property-details">
+                    <h3 class="property-title">Modern 3-Bedroom Family Townhouse</h3>
+                    <p class="property-location"><i class="fa-solid fa-location-dot"></i> Oakwood Suburbs</p>
+                    <div class="property-features">
+                        <span><i class="fa-solid fa-bed"></i> 3 Beds</span>
+                        <span><i class="fa-solid fa-bath"></i> 2.5 Baths</span>
+                        <span><i class="fa-solid fa-house"></i> Townhouse</span>
+                    </div>
+                    <button class="card-btn" onclick="askAIChat('Tell me more about the Modern 3-Bedroom Family Townhouse in Oakwood Suburbs')">
+                        <i class="fa-solid fa-sparkles"></i> Ask AI About This
+                    </button>
+                </div>
+            </div>
+
+            <!-- Property 2 -->
+            <div class="property-card">
+                <div class="property-image-placeholder prop-img-villa">
+                    <span class="badge-price">$1,250,000</span>
+                    <span class="badge-tag">Ocean View</span>
+                </div>
+                <div class="property-details">
+                    <h3 class="property-title">Luxury 4-Bedroom Villa with Ocean View</h3>
+                    <p class="property-location"><i class="fa-solid fa-location-dot"></i> Sunset Cliff, Coastal Heights</p>
+                    <div class="property-features">
+                        <span><i class="fa-solid fa-bed"></i> 4 Beds</span>
+                        <span><i class="fa-solid fa-bath"></i> 4.5 Baths</span>
+                        <span><i class="fa-solid fa-swimming-pool"></i> Infinity Pool</span>
+                    </div>
+                    <button class="card-btn" onclick="askAIChat('Can you describe the Luxury 4-Bedroom Villa with Ocean View?')">
+                        <i class="fa-solid fa-sparkles"></i> Ask AI About This
+                    </button>
+                </div>
+            </div>
+
+            <!-- Property 3 -->
+            <div class="property-card">
+                <div class="property-image-placeholder prop-img-loft">
+                    <span class="badge-price">$280,000</span>
+                    <span class="badge-tag">Downtown</span>
+                </div>
+                <div class="property-details">
+                    <h3 class="property-title">Cozy 1-Bedroom Downtown Loft</h3>
+                    <p class="property-location"><i class="fa-solid fa-location-dot"></i> Downtown Metro District</p>
+                    <div class="property-features">
+                        <span><i class="fa-solid fa-bed"></i> 1 Bed</span>
+                        <span><i class="fa-solid fa-bath"></i> 1.0 Bath</span>
+                        <span><i class="fa-solid fa-train"></i> Transit Near</span>
+                    </div>
+                    <button class="card-btn" onclick="askAIChat('What features does the Cozy 1-Bedroom Downtown Loft have?')">
+                        <i class="fa-solid fa-sparkles"></i> Ask AI About This
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. RAG Chatbot Widget Interface -->
+    <!-- Floating Chat Trigger Button -->
+    <button class="chat-trigger-btn" id="chatTrigger" onclick="toggleChat()">
+        <span class="pulse-ring"></span>
+        <i class="fa-solid fa-comment-dots text-icon"></i>
+        <i class="fa-solid fa-xmark close-icon hidden"></i>
+        <span class="notification-badge">1</span>
+    </button>
+
+    <!-- Chat Drawer Panel -->
+    <div class="chat-drawer" id="chatDrawer">
+        <!-- Chat Header -->
+        <div class="chat-header">
+            <div class="chat-agent-info">
+                <div class="agent-avatar">
+                    <i class="fa-solid fa-robot"></i>
+                    <span class="status-dot online"></span>
+                </div>
+                <div class="agent-text">
+                    <h4>Apex Horizon Concierge</h4>
+                    <p>AI RAG Search Assistant</p>
+                </div>
+            </div>
+            <button class="chat-close-btn" onclick="toggleChat(false)">
+                <i class="fa-solid fa-minus"></i>
+            </button>
+        </div>
+
+        <!-- Chat Output Messages Feed -->
+        <div class="chat-messages" id="chatMessages">
+            <div class="msg-bubble bot">
+                <div class="message-content">
+                    <p>Hello! I am your AI assistant. I can search our active property database and answer questions about locations, pricing, features, or buying rules. How can I help you find your dream home today?</p>
+                </div>
+                <span class="msg-timestamp">Just now</span>
+            </div>
+        </div>
+
+        <!-- Suggestion Chips (Predefined Queries) -->
+        <div class="suggestion-chips" id="suggestionChips">
+            <button class="chip" onclick="askAIChat('Show me 3-bedroom family townhouses')">🏡 3-Bed Townhouse</button>
+            <button class="chip" onclick="askAIChat('Do you have properties with pools or ocean views?')">🌊 Ocean View & Pool</button>
+            <button class="chip" onclick="askAIChat('Are there any listings under $300,000?')">💰 Under $300k</button>
+            <button class="chip" onclick="askAIChat('I want a quiet cottage with a large backyard')">🌳 Cottage with Yard</button>
+        </div>
+
+        <!-- Chat Input Form -->
+        <div class="chat-input-area">
+            <form id="chatForm" onsubmit="handleChatSubmit(event)">
+                <input type="text" id="chatInputField" placeholder="Type a message..." autocomplete="off">
+                <button type="submit" class="chat-send-btn" id="chatSendBtn">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom Javascript Widget Logic -->
+    <script src="widget.js"></script>
+</body>
+</html>
