@@ -2,7 +2,7 @@
   {
     "id": "prop_001",
     "title": "Modern 3-Bedroom Family Townhouse",
-    "price": 450000,
+    "price": 37500000,
     "location": "Oakwood Suburbs, near Oakwood High School",
     "bedrooms": 3,
     "bathrooms": 2.5,
@@ -12,7 +12,7 @@
   {
     "id": "prop_002",
     "title": "Luxury 4-Bedroom Villa with Ocean View",
-    "price": 1250000,
+    "price": 100000000,
     "location": "Sunset Cliff, Coastal Heights",
     "bedrooms": 4,
     "bathrooms": 4.5,
@@ -22,7 +22,7 @@
   {
     "id": "prop_003",
     "title": "Cozy 1-Bedroom Downtown Loft",
-    "price": 280000,
+    "price": 23000000,
     "location": "Downtown Metro District",
     "bedrooms": 1,
     "bathrooms": 1.0,
@@ -32,7 +32,7 @@
   {
     "id": "prop_004",
     "title": "Suburban 2-Bedroom Home with Large Backyard",
-    "price": 380000,
+    "price": 31500000,
     "location": "Green Valley Valley Village",
     "bedrooms": 2,
     "bathrooms": 2.0,
@@ -42,11 +42,41 @@
   {
     "id": "prop_005",
     "title": "Spacious 5-Bedroom Estate with Guest House",
-    "price": 1850000,
+    "price": 150000000,
     "location": "Pine Ridge Hills",
     "bedrooms": 5,
     "bathrooms": 5.0,
     "description": "Grand estate situated on 2 acres of mature pine trees. Includes a massive primary suite, finished basement with home theater, and a detached 1-bedroom guest house. Top-tier privacy and state-of-the-art security systems.",
     "tags": ["estate", "luxury", "privacy", "guest-house", "acreage"]
+  },
+  {
+    "id": "prop_006",
+    "title": "Emami Aastha Bungalow",
+    "price": 8500000,
+    "location": "Joka, Kolkata",
+    "bedrooms": 4,
+    "bathrooms": 4.0,
+    "description": "A prestigious under-construction residential development spanning 40 acres. Offering premium 4 BHK Bungalows ranging from 1800 to 2000 sq.ft. carpet area. Located in Joka, Kolkata. Priced at ₹85 Lakhs onwards.",
+    "tags": ["bungalow", "under-construction", "4-bhk", "kolkata", "joka", "residential"]
+  },
+  {
+    "id": "prop_007",
+    "title": "Emami Business Bay",
+    "price": 5500000,
+    "location": "Salt Lake, Sector V, Kolkata",
+    "bedrooms": 0,
+    "bathrooms": 2.0,
+    "description": "Premium commercial offices and retail spaces located in the business address of Kolkata. Highlights include rooftop terrace amenities such as cricket and soccer turfs, an open gym, a jogging track, and a landscaping cafe. Priced at ₹55 Lakhs onwards.",
+    "tags": ["commercial", "office", "retail", "kolkata", "sector-v", "rooftop-amenities"]
+  },
+  {
+    "id": "prop_008",
+    "title": "Merlin - The Summit",
+    "price": 4644000,
+    "location": "Salt Lake, Sector V, Kolkata",
+    "bedrooms": 0,
+    "bathrooms": 2.0,
+    "description": "Class-A commercial office building with an exquisite facade, grand entrance lobby, and lake views. Offers workspaces with 3.6-meter floor heights, VRV AC provisions, 24/7 security with CCTV/RFID, 100% power backup, and a large breakout zone with a cafeteria. Priced at ₹46.44 Lakhs onwards.",
+    "tags": ["commercial", "office", "lake-view", "kolkata", "sector-v", "premium"]
   }
 ]

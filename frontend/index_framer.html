@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus RAG — Framer Motion Knowledge System</title>
+    <!-- Modern Google Typography (Inter & Plus Jakarta Sans) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- React, ReactDOM, Babel for in-browser JSX, and Framer Motion -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@11.15.0/dist/framer-motion.js"></script>
+
+    <style>
+        :root {
+            --bg-base: #030712;
+            --surface-1: rgba(17, 24, 39, 0.7);
+            --surface-2: rgba(31, 41, 55, 0.6);
+            --border-subtle: rgba(255, 255, 255, 0.07);
+            --border-hover: rgba(255, 255, 255, 0.18);
+            --text-high: #f9fafb;
+            --text-mid: #9ca3af;
+            --text-dim: #6b7280;
+            --accent-cyan: #38bdf8;
+            --accent-purple: #a855f7;
+            --accent-emerald: #10b981;
+            --font-main: 'Inter', -apple-system, sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-base);
+            color: var(--text-high);
+            line-height: 1.5;
+            min-height: 100vh;
+            overflow-x: hidden;
+            letter-spacing: -0.015em;
+        }
+
+        /* Framer-style subtle matrix grid pattern */
+        .framer-grid-bg {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Ambient spotlight glow */
+        .framer-spotlight {
+            position: fixed;
+            top: -20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, rgba(168, 85, 247, 0.08) 40%, transparent 70%);
+            filter: blur(100px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #root {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px 20px 80px;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
+            margin-bottom: 50px;
+            background: rgba(10, 15, 29, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 9999px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .brand-badge {
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #38bdf8, #a855f7);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #030712;
+            font-size: 0.85rem;
+        }
+
+        .status-pill {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-mid);
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle);
+            padding: 5px 14px;
+            border-radius: 9999px;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            background: var(--accent-emerald);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--accent-emerald);
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            max-width: 840px;
+            margin: 0 auto 50px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+            padding: 6px 16px;
+            border-radius: 9999px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-mid);
+            margin-bottom: 24px;
+        }
+
+        .hero-badge i {
+            color: var(--accent-cyan);
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #ffffff 40%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .highlight-text {
+            background: linear-gradient(135deg, #38bdf8 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 1.15rem;
+            color: var(--text-mid);
+            line-height: 1.6;
+            max-width: 650px;
+            margin: 0 auto 36px;
+        }
+
+        /* Framer Command Input Box */
+        .framer-input-container {
+            position: relative;
+            max-width: 720px;
+            margin: 0 auto 20px;
+        }
+
+        .framer-input-card {
+            background: rgba(13, 19, 35, 0.8);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 8px 10px 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .framer-input-card:focus-within {
+            border-color: rgba(56, 189, 248, 0.5);
+            box-shadow: 0 10px 50px rgba(56, 189, 248, 0.15);
+        }
+
+        .main-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-size: 1.05rem;
+            font-family: inherit;
+        }
+
+        .main-input::placeholder {
+            color: var(--text-dim);
+        }
+
+        .submit-btn {
+            background: #fff;
+            color: #030712;
+            border: none;
+            font-weight: 600;
+            font-size: 0.92rem;
+            padding: 10px 22px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.15s, opacity 0.15s;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.02);
+            opacity: 0.95;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Filter Pills */
+        .pills-bar {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 50px;
+        }
+
+        .framer-pill {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-mid);
+            padding: 6px 14px;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .framer-pill:hover {
+            background: rgba(255, 255, 255, 0.07);
+            color: #fff;
+            border-color: var(--border-hover);
+        }
+
+        /* Bento Grid */
+        .bento-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 950px) {
+            .bento-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-title {
+                font-size: 2.5rem;
+            }
+        }
+
+        .bento-card {
+            background: rgba(13, 19, 35, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 20px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        .card-glow-line {
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        }
+
+        .bento-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .bento-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+        }
+
+        .bento-badge {
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .badge-llm {
+            background: rgba(56, 189, 248, 0.12);
+            color: var(--accent-cyan);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+
+        .badge-rag {
+            background: rgba(168, 85, 247, 0.12);
+            color: var(--accent-purple);
+            border: 1px solid rgba(168, 85, 247, 0.25);
+        }
+
+        .answer-text {
+            font-size: 1.02rem;
+            color: #e5e7eb;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        .placeholder-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 240px;
+            color: var(--text-dim);
+            text-align: center;
+            gap: 12px;
+            font-size: 0.95rem;
+        }
+
+        .placeholder-state i {
+            font-size: 2.2rem;
+            color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Vector Chunks */
+        .chunks-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 480px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .chunks-wrapper::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chunks-wrapper::-webkit-scrollbar-thumb {
+            background: var(--border-subtle);
+            border-radius: 4px;
+        }
+
+        .framer-chunk-item {
+            background: rgba(7, 10, 19, 0.6);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 0.86rem;
+            position: relative;
+        }
+
+        .framer-chunk-item.prop {
+            border-left: 3px solid var(--accent-purple);
+        }
+
+        .framer-chunk-item.kb {
+            border-left: 3px solid var(--accent-emerald);
+        }
+
+        .chunk-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.72rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .tag-prop { color: var(--accent-purple); }
+        .tag-kb { color: var(--accent-emerald); }
+
+        .chunk-content-body {
+            font-family: var(--font-code);
+            font-size: 0.78rem;
+            color: #d1d5db;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+
+        /* Telemetry Bento Row */
+        .telemetry-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 750px) {
+            .telemetry-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .metric-card {
+            background: rgba(13, 19, 35, 0.4);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 16px 20px;
+        }
+
+        .metric-label {
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 6px;
+        }
+
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric-desc {
+            font-size: 0.76rem;
+            color: var(--text-mid);
+            margin-top: 4px;
+        }
+
+        /* Footer */
+        .framer-footer {
+            margin-top: 60px;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="framer-grid-bg"></div>
+    <div class="framer-spotlight"></div>
+
+    <div id="root"></div>
+
+    <!-- React + Framer Motion Application -->
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { motion, AnimatePresence } = window.Motion;
+
+        const BACKEND_URL = "http://127.0.0.1:8000";
+
+        function App() {
+            const [query, setQuery] = useState("What is an HOA and how much are the monthly fees?");
+            const [loading, setLoading] = useState(false);
+            const [answer, setAnswer] = useState(null);
+            const [context, setContext] = useState({ properties: [], knowledge_chunks: [] });
+            const [latency, setLatency] = useState(null);
+
+            const handleSearch = async (targetQuery = query) => {
+                if (!targetQuery.trim() || loading) return;
+                setLoading(true);
+                setAnswer(null);
+                setContext({ properties: [], knowledge_chunks: [] });
+                const startTime = performance.now();
+
+                try {
+                    const res = await fetch(`${BACKEND_URL}/api/chat`, {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ query: targetQuery.trim() })
+                    });
+                    if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+                    const data = await res.json();
+                    setAnswer(data.answer);
+                    setContext(data.retrieved_context || { properties: [], knowledge_chunks: [] });
+                } catch (err) {
+                    setAnswer(`❌ Pipeline Error: ${err.message}. Check that uvicorn backend is running on port 8000.`);
+                } finally {
+                    setLatency(Math.round(performance.now() - startTime));
+                    setLoading(false);
+                }
+            };
+
+            const triggerPill = (text) => {
+                setQuery(text);
+                handleSearch(text);
+            };
+
+            return (
+                <div>
+                    {/* Floating Navbar */}
+                    <motion.header 
+                        className="navbar"
+                        initial={{ y: -20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.6 }}
+                    >
+                        <a href="#" className="brand">
+                            <div className="brand-badge"><i className="fa-solid fa-cube"></i></div>
+                            <span>Nexus RAG</span>
+                        </a>
+
+                        <div className="status-pill">
+                            <span className="status-dot"></span>
+                            <span>ChromaDB Vector Store • 28 Embeddings</span>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Engine: Gemini-2.5-Flash</span>
+                        </div>
+                    </motion.header>
+
+                    {/* Hero Section */}
+                    <div className="hero">
+                        <motion.div 
+                            className="hero-badge"
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ duration: 0.5, delay: 0.1 }}
+                        >
+                            <i className="fa-solid fa-sparkles"></i>
+                            <span>Framer Motion Powered Grounded Intelligence</span>
+                        </motion.div>
+
+                        <motion.h1 
+                            className="hero-title"
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ duration: 0.6, delay: 0.2 }}
+                        >
+                            <span className="gradient-text">Deterministic Answers.</span><br/>
+                            <span className="highlight-text">Zero Hallucinations.</span>
+                        </motion.h1>
+
+                        <motion.p 
+                            className="hero-desc"
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ duration: 0.6, delay: 0.3 }}
+                        >
+                            A decoupled RAG engine linking ChromaDB dense vector indexing, sliding-window chunking, and dual-collection semantic search.
+                        </motion.p>
+
+                        {/* Framer Input Bar */}
+                        <motion.div 
+                            className="framer-input-container"
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ duration: 0.6, delay: 0.4 }}
+                        >
+                            <div className="framer-input-card">
+                                <i className="fa-solid fa-magnifying-glass" style={{ color: 'var(--text-dim)', fontSize: '1rem' }}></i>
+                                <input 
+                                    type="text" 
+                                    className="main-input"
+                                    value={query} 
+                                    onChange={(e) => setQuery(e.target.value)}
+                                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                                    placeholder="Ask anything about properties, mortgages, HOA rules..."
+                                />
+                                <motion.button 
+                                    className="submit-btn" 
+                                    disabled={loading}
+                                    onClick={() => handleSearch()}
+                                    whileHover={{ scale: 1.02 }}
+                                    whileTap={{ scale: 0.98 }}
+                                >
+                                    {loading ? (
+                                        <>
+                                            <i className="fa-solid fa-circle-notch fa-spin"></i>
+                                            <span>Searching...</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span>Execute</span>
+                                            <i className="fa-solid fa-arrow-right"></i>
+                                        </>
+                                    )}
+                                </motion.button>
+                            </div>
+                        </motion.div>
+
+                        {/* Query Pills */}
+                        <motion.div 
+                            className="pills-bar"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.6, delay: 0.5 }}
+                        >
+                            <button className="framer-pill" onClick={() => triggerPill("What is an HOA and how much are the monthly fees?")}>
+                                🛡️ HOA & Rules
+                            </button>
+                            <button className="framer-pill" onClick={() => triggerPill("Show me luxury villas with ocean view")}>
+                                🌊 Ocean View Villa
+                            </button>
+                            <button className="framer-pill" onClick={() => triggerPill("What documents are required for a home loan in India?")}>
+                                📄 Home Loan Docs
+                            </button>
+                            <button className="framer-pill" onClick={() => triggerPill("What is the stamp duty rate in West Bengal?")}>
+                                📑 Stamp Duty Rates
+                            </button>
+                        </motion.div>
+                    </div>
+
+                    {/* Bento Grid Workspace */}
+                    <div className="bento-grid">
+                        {/* 1. Synthesis Card */}
+                        <motion.div 
+                            className="bento-card"
+                            initial={{ x: -20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ duration: 0.6, delay: 0.3 }}
+                        >
+                            <div className="card-glow-line"></div>
+                            <div className="bento-header">
+                                <div className="bento-title">
+                                    <i className="fa-solid fa-brain" style={{ color: 'var(--accent-cyan)' }}></i>
+                                    <span>Grounded LLM Generation</span>
+                                </div>
+                                <span className="bento-badge badge-llm">Gemini 2.5 Flash</span>
+                            </div>
+
+                            <AnimatePresence mode="wait">
+                                {loading ? (
+                                    <motion.div 
+                                        key="loading"
+                                        initial={{ opacity: 0 }}
+                                        animate={{ opacity: 1 }}
+                                        exit={{ opacity: 0 }}
+                                        className="placeholder-state"
+                                    >
+                                        <i className="fa-solid fa-circle-notch fa-spin" style={{ color: 'var(--accent-cyan)' }}></i>
+                                        <span>Embedding query & running vector search...</span>
+                                    </motion.div>
+                                ) : answer ? (
+                                    <motion.div 
+                                        key="answer"
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="answer-text"
+                                    >
+                                        {answer}
+                                    </motion.div>
+                                ) : (
+                                    <motion.div key="empty" className="placeholder-state">
+                                        <i className="fa-regular fa-comment-dots"></i>
+                                        <span>Click a pill or ask a query above to view the grounded response.</span>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.div>
+
+                        {/* 2. Vector Chunks Card (Observability) */}
+                        <motion.div 
+                            className="bento-card"
+                            initial={{ x: 20, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ duration: 0.6, delay: 0.4 }}
+                        >
+                            <div className="card-glow-line"></div>
+                            <div className="bento-header">
+                                <div className="bento-title">
+                                    <i className="fa-solid fa-diagram-project" style={{ color: 'var(--accent-purple)' }}></i>
+                                    <span>Retrieved ChromaDB Chunks</span>
+                                </div>
+                                <span className="bento-badge badge-rag">Top-K = 2</span>
+                            </div>
+
+                            <div className="chunks-wrapper">
+                                <AnimatePresence>
+                                    {context.properties.length === 0 && context.knowledge_chunks.length === 0 ? (
+                                        <div className="placeholder-state">
+                                            <i className="fa-solid fa-cubes-stacked"></i>
+                                            <span>Retrieved chunks from properties & knowledge base appear here.</span>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            {context.properties.map((p, idx) => (
+                                                <motion.div 
+                                                    key={`prop-${idx}`}
+                                                    className="framer-chunk-item prop"
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: idx * 0.1 }}
+                                                >
+                                                    <div className="chunk-header-row">
+                                                        <span className="tag-prop"><i className="fa-solid fa-building"></i> properties_collection</span>
+                                                        <span style={{ color: 'var(--text-dim)' }}>Rank #{idx + 1}</span>
+                                                    </div>
+                                                    <div className="chunk-content-body">{p}</div>
+                                                </motion.div>
+                                            ))}
+
+                                            {context.knowledge_chunks.map((k, idx) => (
+                                                <motion.div 
+                                                    key={`kb-${idx}`}
+                                                    className="framer-chunk-item kb"
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: (idx + context.properties.length) * 0.1 }}
+                                                >
+                                                    <div className="chunk-header-row">
+                                                        <span className="tag-kb"><i className="fa-solid fa-book"></i> knowledge_chunks (500-char, 20% stride)</span>
+                                                        <span style={{ color: 'var(--text-dim)' }}>Rank #{idx + 1}</span>
+                                                    </div>
+                                                    <div className="chunk-content-body">{k}</div>
+                                                </motion.div>
+                                            ))}
+                                        </>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+                        </motion.div>
+                    </div>
+
+                    {/* Architecture Telemetry Row */}
+                    <motion.div 
+                        className="telemetry-row"
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ duration: 0.6, delay: 0.5 }}
+                    >
+                        <div className="metric-card">
+                            <div className="metric-label">Embedding Strategy</div>
+                            <div className="metric-value">
+                                <i className="fa-solid fa-arrows-split-up-and-left" style={{ color: 'var(--accent-cyan)', fontSize: '1rem' }}></i>
+                                <span>Asymmetric</span>
+                            </div>
+                            <div className="metric-desc">retrieval_query vs retrieval_document</div>
+                        </div>
+
+                        <div className="metric-card">
+                            <div className="metric-label">Sliding Window Chunking</div>
+                            <div className="metric-value">
+                                <i className="fa-solid fa-layer-group" style={{ color: 'var(--accent-purple)', fontSize: '1rem' }}></i>
+                                <span>500 Chars / 20%</span>
+                            </div>
+                            <div className="metric-desc">100-character overlap preserves context</div>
+                        </div>
+
+                        <div className="metric-card">
+                            <div className="metric-label">Pipeline Latency</div>
+                            <div className="metric-value">
+                                <i className="fa-solid fa-stopwatch" style={{ color: 'var(--accent-emerald)', fontSize: '1rem' }}></i>
+                                <span>{latency ? `${latency} ms` : 'Standby'}</span>
+                            </div>
+                            <div className="metric-desc">End-to-end vector search + synthesis</div>
+                        </div>
+                    </motion.div>
+
+                    <footer className="framer-footer">
+                        Nexus RAG • Built with Framer Motion, FastAPI & ChromaDB
+                    </footer>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

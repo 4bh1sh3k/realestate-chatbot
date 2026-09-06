@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q'Chat — Intelligent Real Estate RAG Engine</title>
+    <!-- Modern Google Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <!-- FontAwesome for sleek icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg: #090d16;
+            --bg-secondary: #0d1322;
+            --card-bg: rgba(16, 23, 38, 0.75);
+            --card-hover: rgba(22, 31, 50, 0.85);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-highlight: rgba(99, 102, 241, 0.35);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --gradient-primary: linear-gradient(135deg, #818cf8 0%, #38bdf8 50%, #c084fc 100%);
+            --gradient-card: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+            --accent-glow: rgba(99, 102, 241, 0.18);
+            --cyan-glow: rgba(56, 189, 248, 0.18);
+            --prop-color: #a855f7;
+            --kb-color: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Ambient Glow Backgrounds */
+        .ambient-glow {
+            position: fixed;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            filter: blur(140px);
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.45;
+        }
+
+        .glow-1 {
+            top: -150px;
+            left: 20%;
+            background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+        }
+
+        .glow-2 {
+            top: 250px;
+            right: 10%;
+            background: radial-gradient(circle, #38bdf8 0%, transparent 70%);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Floating Glass Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 28px;
+            margin-top: 20px;
+            margin-bottom: 40px;
+            background: rgba(13, 19, 34, 0.65);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .brand-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .brand-logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--gradient-primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #090d16;
+            font-size: 1rem;
+        }
+
+        .nav-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.04);
+            padding: 6px 14px;
+            border-radius: 50px;
+            border: 1px solid var(--border);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #10b981;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .btn-ghost:hover {
+            color: #fff;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: #090d16;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 8px 20px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(56, 189, 248, 0.35);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 20px 0 40px;
+        }
+
+        .pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(99, 102, 241, 0.12);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #a5b4fc;
+            margin-bottom: 20px;
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.2);
+        }
+
+        .hero-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.15;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .text-gradient {
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 620px;
+            margin: 0 auto 36px;
+            line-height: 1.6;
+        }
+
+        /* Q'Chat Command Center Box */
+        .command-bar-wrapper {
+            max-width: 820px;
+            margin: 0 auto 40px;
+            position: relative;
+        }
+
+        .command-bar {
+            background: rgba(16, 23, 38, 0.85);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border-highlight);
+            border-radius: 16px;
+            padding: 10px 12px 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.45), 0 0 25px var(--accent-glow);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .command-bar:focus-within {
+            border-color: #38bdf8;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.55), 0 0 35px var(--cyan-glow);
+        }
+
+        .search-icon {
+            color: var(--text-muted);
+            font-size: 1.15rem;
+        }
+
+        .command-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-size: 1.05rem;
+            font-family: inherit;
+        }
+
+        .command-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .execute-btn {
+            background: var(--gradient-primary);
+            color: #090d16;
+            border: none;
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .execute-btn:hover {
+            opacity: 0.92;
+            transform: scale(1.02);
+        }
+
+        .execute-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Query Suggestion Pills */
+        .query-pills {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .query-pill {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 6px 14px;
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .query-pill:hover {
+            background: rgba(99, 102, 241, 0.12);
+            color: #f8fafc;
+            border-color: rgba(99, 102, 241, 0.35);
+            transform: translateY(-1px);
+        }
+
+        /* Main Workspace Canvas (Dual Pane) */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 24px;
+            margin-bottom: 60px;
+        }
+
+        @media (max-width: 900px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-title {
+                font-size: 2.3rem;
+            }
+        }
+
+        .glass-panel {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.12), transparent);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .panel-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title i {
+            color: #38bdf8;
+        }
+
+        .panel-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 6px;
+        }
+
+        .badge-generation {
+            background: rgba(56, 189, 248, 0.12);
+            color: #7dd3fc;
+            border: 1px solid rgba(56, 189, 248, 0.25);
+        }
+
+        .badge-retrieval {
+            background: rgba(168, 85, 247, 0.12);
+            color: #d8b4fe;
+            border: 1px solid rgba(168, 85, 247, 0.25);
+        }
+
+        /* Answer Content */
+        .answer-box {
+            font-size: 1rem;
+            color: #e2e8f0;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            flex: 1;
+        }
+
+        .empty-placeholder {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-style: italic;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 220px;
+            text-align: center;
+            gap: 12px;
+        }
+
+        .empty-placeholder i {
+            font-size: 2.5rem;
+            color: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Chunk List */
+        .chunk-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            max-height: 480px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .chunk-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .chunk-list::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 4px;
+        }
+
+        .chunk-card {
+            background: rgba(9, 13, 22, 0.6);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px 16px;
+            font-size: 0.86rem;
+            position: relative;
+            transition: all 0.2s;
+        }
+
+        .chunk-card:hover {
+            background: rgba(15, 23, 38, 0.8);
+            border-color: rgba(255, 255, 255, 0.14);
+        }
+
+        .chunk-card.prop {
+            border-left: 3px solid var(--prop-color);
+        }
+
+        .chunk-card.kb {
+            border-left: 3px solid var(--kb-color);
+        }
+
+        .chunk-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.72rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .chunk-tag-prop { color: var(--prop-color); }
+        .chunk-tag-kb { color: var(--kb-color); }
+
+        .chunk-text {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            color: #cbd5e1;
+            line-height: 1.55;
+            white-space: pre-wrap;
+        }
+
+        /* Loading indicator */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(9, 13, 22, 0.3);
+            border-radius: 50%;
+            border-top-color: #090d16;
+            animation: spin 0.7s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            border-top: 1px solid var(--border);
+        }
+    </style>
+</head>
+<body>
+    <!-- Ambient Background Lighting -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+
+    <div class="container">
+        <!-- Floating Navbar -->
+        <header class="navbar">
+            <a href="#" class="brand-logo">
+                <div class="brand-logo-icon">
+                    <i class="fa-solid fa-bolt"></i>
+                </div>
+                <span>Q'Chat</span>
+            </a>
+
+            <div class="nav-status">
+                <span class="status-dot"></span>
+                <span>ChromaDB Vector Store • 28 Embeddings</span>
+            </div>
+
+            <div class="nav-actions">
+                <button class="btn-ghost" onclick="setQuery('Show me luxury villas with ocean view')">Example Query</button>
+                <button class="btn-primary" onclick="document.getElementById('queryInput').focus()">Ask AI</button>
+            </div>
+        </header>
+
+        <!-- Hero Title Section -->
+        <section class="hero">
+            <div class="pill-badge">
+                <i class="fa-solid fa-sparkles"></i>
+                <span>Grounded RAG Pipeline & Multi-Source Engine</span>
+            </div>
+            <h1 class="hero-title">
+                Ask with Confidence.<br>
+                <span class="text-gradient">Verified with Vector Retrieval.</span>
+            </h1>
+            <p class="hero-subtitle">
+                A decoupled RAG service utilizing Gemini embeddings, sliding-window chunking, and dual-collection semantic search to eliminate hallucination.
+            </p>
+
+            <!-- Q'Chat Centerpiece Command Bar -->
+            <div class="command-bar-wrapper">
+                <div class="command-bar">
+                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                    <input type="text" id="queryInput" class="command-input" placeholder="Ask about properties, HOA rules, stamp duties, or loans..." autocomplete="off">
+                    <button class="execute-btn" id="askBtn" onclick="runRAG()">
+                        <span id="btnText">Generate</span>
+                        <i class="fa-solid fa-arrow-right" id="btnIcon"></i>
+                    </button>
+                </div>
+
+                <!-- Instant Filter Suggestion Pills -->
+                <div class="query-pills">
+                    <span class="query-pill" onclick="setQuery('What is an HOA and how much are the monthly fees?')">
+                        <i class="fa-solid fa-shield-halved"></i> HOA & Rules
+                    </span>
+                    <span class="query-pill" onclick="setQuery('Show me luxury villas with ocean view')">
+                        <i class="fa-solid fa-house-chimney-window"></i> Ocean View Villa
+                    </span>
+                    <span class="query-pill" onclick="setQuery('What documents are required for a home loan in India?')">
+                        <i class="fa-solid fa-file-invoice-dollar"></i> Home Loan Docs
+                    </span>
+                    <span class="query-pill" onclick="setQuery('What is the stamp duty rate in West Bengal?')">
+                        <i class="fa-solid fa-stamp"></i> Stamp Duty Rates
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Inspection Canvas -->
+        <main class="workspace-grid">
+            <!-- 1. LLM Grounded Answer Card -->
+            <div class="glass-panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i class="fa-solid fa-robot"></i>
+                        <span>Synthesized Response</span>
+                    </div>
+                    <span class="panel-badge badge-generation">Gemini-2.5-Flash</span>
+                </div>
+                <div id="answerArea" class="answer-box">
+                    <div class="empty-placeholder">
+                        <i class="fa-solid fa-brain"></i>
+                        <span>Select a query above or type your own question to trigger semantic retrieval.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. ChromaDB Retrieved Context Chunks (Telemetry / Observability Pane) -->
+            <div class="glass-panel">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <i class="fa-solid fa-database"></i>
+                        <span>Retrieved Context Chunks</span>
+                    </div>
+                    <span class="panel-badge badge-retrieval">ChromaDB Top-2</span>
+                </div>
+                <div id="retrievedArea" class="chunk-list">
+                    <div class="empty-placeholder">
+                        <i class="fa-solid fa-network-wired"></i>
+                        <span>ChromaDB vector chunks matching your semantic intent will appear here.</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Minimal Footer -->
+        <footer>
+            Built with FastAPI, ChromaDB, and Google Gemini • Observability-focused RAG Architecture
+        </footer>
+    </div>
+
+    <!-- Client-Side RAG Fetch Logic -->
+    <script>
+        const BACKEND_URL = "http://127.0.0.1:8000";
+
+        function setQuery(text) {
+            document.getElementById("queryInput").value = text;
+            runRAG();
+        }
+
+        async function runRAG() {
+            const input = document.getElementById("queryInput");
+            const query = input.value.trim();
+            if (!query) return;
+
+            const btn = document.getElementById("askBtn");
+            const btnText = document.getElementById("btnText");
+            const btnIcon = document.getElementById("btnIcon");
+            const answerArea = document.getElementById("answerArea");
+            const retrievedArea = document.getElementById("retrievedArea");
+
+            // UI Loading state
+            btn.disabled = true;
+            btnText.textContent = "Retrieving...";
+            btnIcon.className = "spinner";
+            answerArea.innerHTML = `<div style="color: #38bdf8; font-style: italic;"><i class="fa-solid fa-circle-notch fa-spin"></i> Embedding query with task_type='retrieval_query' & synthesizing response...</div>`;
+            retrievedArea.innerHTML = `<div style="color: var(--text-muted); font-style: italic;">Scanning ChromaDB vector space...</div>`;
+
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/chat`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query: query })
+                });
+
+                if (!res.ok) {
+                    throw new Error(`Server returned HTTP ${res.status}`);
+                }
+
+                const data = await res.json();
+
+                // 1. Render Grounded Answer
+                answerArea.textContent = data.answer;
+
+                // 2. Render Retrieved Chunks with Badges
+                const props = data.retrieved_context.properties || [];
+                const kb = data.retrieved_context.knowledge_chunks || [];
+
+                if (props.length === 0 && kb.length === 0) {
+                    retrievedArea.innerHTML = `<div class="empty-placeholder"><span>No vector matches found in database.</span></div>`;
+                } else {
+                    let html = "";
+                    props.forEach((item, idx) => {
+                        html += `
+                            <div class="chunk-card prop">
+                                <div class="chunk-meta">
+                                    <span class="chunk-tag-prop"><i class="fa-solid fa-building"></i> properties_collection</span>
+                                    <span style="color: var(--text-muted)">Rank #${idx + 1}</span>
+                                </div>
+                                <div class="chunk-text">${escapeHtml(item)}</div>
+                            </div>`;
+                    });
+
+                    kb.forEach((chunk, idx) => {
+                        html += `
+                            <div class="chunk-card kb">
+                                <div class="chunk-meta">
+                                    <span class="chunk-tag-kb"><i class="fa-solid fa-book-bookmark"></i> knowledge_chunks (500-char, 20% stride)</span>
+                                    <span style="color: var(--text-muted)">Rank #${idx + 1}</span>
+                                </div>
+                                <div class="chunk-text">${escapeHtml(chunk)}</div>
+                            </div>`;
+                    });
+                    retrievedArea.innerHTML = html;
+                }
+
+            } catch (err) {
+                answerArea.innerHTML = `<div style="color: #f87171;"><i class="fa-solid fa-triangle-exclamation"></i> <strong>Connection Error:</strong> ${err.message}. Ensure the FastAPI backend is running on port 8000.</div>`;
+                retrievedArea.innerHTML = `<div class="empty-placeholder"><span>Retrieval failed.</span></div>`;
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = "Generate";
+                btnIcon.className = "fa-solid fa-arrow-right";
+            }
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // Trigger search on Enter key
+        document.getElementById("queryInput").addEventListener("keypress", (e) => {
+            if (e.key === "Enter") runRAG();
+        });
+    </script>
+</body>
+</html>

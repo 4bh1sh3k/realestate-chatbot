@@ -1,31 +1,106 @@
+<<<<<<< HEAD
 #  Document RAG Chatbot (FastAPI + ChromaDB + Gemini)
 
 This is a **Retrieval-Augmented Generation (RAG)** chatbot involving semantic search, vector databases, and Large Language Model (LLM) integrations.
+=======
+# Estatic — Real Estate RAG Chatbot
 
-The project is designed to ingest local text documents (such as properties, company FAQs, or service brochures), convert them into vector embeddings, store them in a local vector database, and provide a chatbot interface that answers user questions based strictly on the ingested data.
+An engineering-focused **Retrieval-Augmented Generation (RAG)** service built with **FastAPI**, **ChromaDB**, and **Google Gemini**. 
+>>>>>>> 770f3a0 (docs)
+
+This project explores production RAG architecture: **asymmetric vector embeddings**, **sliding-window text chunking**, **deterministic context grounding**, and **decoupled read/write pipelines** to eliminate hallucinations in domain-specific queries.
 
 ---
 
+<<<<<<< HEAD
 ##  How the RAG Pipeline Works
+=======
+## 🏛️ System Architecture
+>>>>>>> 770f3a0 (docs)
 
-This project implements a standard RAG workflow:
-1. **Document Chunking & Processing**: Documents are read, split into overlapping text chunks, and processed.
-2. **Vector Embeddings**: Each text chunk is converted into a high-dimensional vector using Google's `gemini-embedding-001` model.
-3. **Storage**: The vectors and text chunks are saved into a local **ChromaDB** instance.
-4. **Semantic Retrieval**: When a user asks a question, the query is embedded and matched against ChromaDB using cosine similarity to find the most relevant chunks.
-5. **Response Generation**: The retrieved text chunks are passed as context to `gemini-2.5-flash` alongside the user's prompt to generate a factual, hallucination-free answer.
+The service decouples compute-heavy offline indexing from low-latency online inference:
+
+```
+                      [Offline Indexing: ingest.py]
+  Structured Data               Unstructured Domain Text
+ (properties.json)                 (buyers_guide.txt)
+        │                                  │
+        │ Whole-Doc Text                   ▼ Sliding-Window Chunker
+        │ Formulation                 (500 chars / 20% stride)
+        ▼                                  ▼
+ 8 Property Docs                   20 Knowledge Chunks
+        │                                  │
+        └──────────────────┬───────────────┘
+                           ▼
+          Google Gemini Embedding-001 (task_type="retrieval_document")
+                           │
+                           ▼
+             Local Persistent ChromaDB Store
+             ├── properties_collection (8 docs)
+             └── knowledge_chunks     (20 chunks)
+
+──────────────────────────────────────────────────────────────────
+
+                      [Online Inference: main.py]
+                 User Query via REST /api/chat
+                           │
+                           ▼
+          Vectorize Query (task_type="retrieval_query")
+                           │
+             ┌─────────────┴─────────────┐
+             ▼                           ▼
+  ChromaDB: properties (Top-2)    ChromaDB: knowledge (Top-2)
+             └─────────────┬─────────────┘
+                           ▼
+         Strict Grounding System Prompt Augmentation
+                           │
+                           ▼
+             Gemini-2.5-Flash Generation
+                           │
+                           ▼
+             JSON Response + Telemetry Proof
+        { "answer": "...", "retrieved_context": {...} }
+```
+
+---
+
+## 🚀 Key Engineering & RAG Decisions
+
+### 1. Two-Tier Chunking Strategy
+* **Structured Entities (`properties.json`)**: Embedded as complete, individual documents (~150 tokens each). Chunking structured listings would split relational context (e.g., separating price from bedrooms).
+* **Unstructured Domain Text (`buyers_guide.txt`)**: Processed using a custom **sliding-window chunker** with `chunk_size = 500` characters and `overlap = 100` characters (20% stride). This prevents semantic boundary loss when explanations of loans, HOA rules, or stamp duty span split points.
+
+### 2. Asymmetric Embeddings
+Uses Google’s `gemini-embedding-001` with explicit task profiling:
+* `task_type="retrieval_document"` during offline batch ingestion.
+* `task_type="retrieval_query"` during runtime search.  
+This optimizes cosine similarity between asymmetric lengths and syntactic patterns of user queries versus source documents.
+
+### 3. Anti-Hallucination Guardrails
+The system prompt enforces strict deterministic boundaries:
+* The LLM is instructed to answer **exclusively** from the retrieved context blocks.
+* If a listing or legal rule is absent, the model is instructed to gracefully decline rather than extrapolate or fabricate data.
+
+### 4. Decoupled Read/Write Architecture
+* **Write Path (`ingest.py`)**: Heavy I/O and batch vector generation runs offline, preventing runtime ingestion bottlenecks.
+* **Read Path (`main.py`)**: Lightweight, stateless FastAPI REST service designed for low-latency retrieval and horizontal scaling behind an ingress controller.
+
+### 5. Observability & Telemetry
+The `/api/chat` endpoint returns both the synthesized answer **and** the raw vector chunks retrieved from ChromaDB. This enables observability pipelines (e.g., RAGAS metrics: Context Recall, Precision, and Faithfulness) to separate retrieval errors from generation errors.
 
 ---
 
 ##  Tech Stack
 
-*   **Backend**: Python, FastAPI (asynchronous REST API)
-*   **Vector Database**: ChromaDB (configured as a local persistent storage client)
-*   **AI Models**: Google Gemini API (`gemini-2.5-flash` for answering, `gemini-embedding-001` for vector transformations)
-*   **Frontend Sandbox**: Vanilla JavaScript, HTML5, and CSS3 (custom glassmorphic theme and slide-out chat widget)
+* **Backend Framework**: Python 3.13, FastAPI, Pydantic v2, Uvicorn
+* **Vector Database**: ChromaDB (persistent local SQLite vector store)
+* **Embedding Model**: Google `gemini-embedding-001` (768-dim dense vectors)
+* **Foundation LLM**: Google `gemini-2.5-flash`
+* **Frontend Testbed**: HTML5, Vanilla CSS, Fetch API *(AI-assisted prototyping)*
 
 ---
 
+<<<<<<< HEAD
 ##  Project Structure
 
 ```text
@@ -58,19 +133,25 @@ Make sure you have Python 3.10+ installed.
 ### 2. Clone the Repository & Set Up Virtual Environment
 Open your terminal (CMD or PowerShell) in the project directory:
 ```cmd
+=======
+## ⚙️ Setup & Running
+
+### 1. Virtual Environment & Dependencies
+```powershell
+>>>>>>> 770f3a0 (docs)
 python -m venv .venv
-.venv\Scripts\activate.bat
+.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
-### 3. Configure Environment Variables
-Create a file named `.env` inside the `backend/` folder and add your Gemini API Key:
+### 2. Configure Environment
+Create `backend/.env`:
 ```env
 PORT=8000
 GEMINI_API_KEY=your_actual_gemini_api_key_here
 ```
-*(Get your free API Key from [Google AI Studio](https://aistudio.google.com/))*
 
+<<<<<<< HEAD
 ---
 
 ##  Running the Application
@@ -78,20 +159,20 @@ GEMINI_API_KEY=your_actual_gemini_api_key_here
 ### Step 1: Run the Ingestion Pipeline
 To populate the local vector database with your document listings, run:
 ```cmd
+=======
+### 3. Run Ingestion Pipeline (Run Once)
+```powershell
+>>>>>>> 770f3a0 (docs)
 python backend/ingest.py
 ```
-This will read your source data, generate embeddings, and save them in the `backend/database/` directory.
 
-### Step 2: Start the FastAPI Server
-Launch the backend server:
-```cmd
-python -m uvicorn backend.main:app --reload --port 8000
-```
-The server will start running locally at `http://127.0.0.1:8000`.
-
-### Step 3: Run the Frontend Widget
-In a separate terminal window, serve the static frontend folder:
-```cmd
-python -m http.server 3000 --directory frontend
-```
-Now, open your browser and navigate to **`http://localhost:3000`** to interact with the chatbot interface!
+### 4. Start the Application
+* **Terminal 1 (Backend REST API)**:
+  ```powershell
+  python -m uvicorn backend.main:app --reload --port 8000
+  ```
+* **Terminal 2 (Frontend Interface)**:
+  ```powershell
+  python -m http.server 3000 --directory frontend
+  ```
+Open **`http://localhost:3000`** in your browser.

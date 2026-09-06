@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate RAG Explorer (Minimal)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --border: #334155;
+            --accent: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --prop-tag: #8b5cf6;
+            --kb-tag: #10b981;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text-main);
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+        .container { max-width: 850px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 24px; }
+        h1 { font-size: 1.8rem; margin-bottom: 6px; }
+        p.subtitle { color: var(--text-muted); font-size: 0.95rem; }
+        .search-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+        input[type="text"] {
+            flex: 1;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+        }
+        button {
+            background: var(--accent);
+            color: #0f172a;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        .pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
+        .pill {
+            background: rgba(56, 189, 248, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .card-header {
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+        }
+        .answer-content { font-size: 1rem; line-height: 1.7; white-space: pre-wrap; }
+        .chunk-item {
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px;
+            font-size: 0.82rem;
+            font-family: 'Fira Code', monospace;
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+        }
+        .chunk-item.prop { border-left: 3px solid var(--prop-tag); }
+        .chunk-item.kb { border-left: 3px solid var(--kb-tag); }
+        .tag { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; padding: 2px 6px; border-radius: 4px; }
+        .tag-gen { background: rgba(56, 189, 248, 0.2); color: var(--accent); }
+        .tag-ret { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏢 Real Estate RAG Explorer</h1>
+            <p class="subtitle">Minimalist inspection tool for vector retrieval & LLM generation</p>
+        </header>
+
+        <div class="search-box">
+            <input type="text" id="queryInput" placeholder="Ask about properties, loans, HOA..." value="What is an HOA and how much are the fees?">
+            <button id="askBtn" onclick="runRAG()">Submit</button>
+        </div>
+
+        <div class="pills">
+            <span class="pill" onclick="setQuery('What is an HOA and how much are the fees?')">HOA & Fees</span>
+            <span class="pill" onclick="setQuery('Show me luxury villas with ocean view')">Ocean View Villa</span>
+            <span class="pill" onclick="setQuery('What documents do I need for a home loan in India?')">Home Loan Docs</span>
+            <span class="pill" onclick="setQuery('What is the stamp duty rate in West Bengal?')">Stamp Duty</span>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span>🤖 LLM Generated Response</span>
+                <span class="tag tag-gen">Gemini 2.5 Flash</span>
+            </div>
+            <div id="answerArea" class="answer-content">Submit a query above to test the pipeline.</div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span>🔍 Retrieved Context Chunks</span>
+                <span class="tag tag-ret">ChromaDB Top-K</span>
+            </div>
+            <div id="retrievedArea">
+                <p style="color: var(--text-muted); font-size: 0.85rem;">Retrieved vector chunks will appear here.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const BACKEND_URL = "http://127.0.0.1:8000";
+
+        function setQuery(t) {
+            document.getElementById("queryInput").value = t;
+            runRAG();
+        }
+
+        async function runRAG() {
+            const input = document.getElementById("queryInput");
+            const q = input.value.trim();
+            if (!q) return;
+
+            const btn = document.getElementById("askBtn");
+            const ans = document.getElementById("answerArea");
+            const ret = document.getElementById("retrievedArea");
+
+            btn.disabled = true;
+            ans.textContent = "Retrieving & generating...";
+            ret.innerHTML = "";
+
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/chat`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query: q })
+                });
+                const data = await res.json();
+                ans.textContent = data.answer;
+
+                const props = data.retrieved_context.properties || [];
+                const kb = data.retrieved_context.knowledge_chunks || [];
+
+                let html = "";
+                props.forEach((p, idx) => {
+                    html += `<div class="chunk-item prop"><strong>[Property Listing #${idx+1}]</strong>\n${escapeHtml(p)}</div>`;
+                });
+                kb.forEach((k, idx) => {
+                    html += `<div class="chunk-item kb"><strong>[Knowledge Chunk #${idx+1}]</strong>\n${escapeHtml(k)}</div>`;
+                });
+                ret.innerHTML = html || "<p style='color:#94a3b8'>No chunks retrieved.</p>";
+            } catch (err) {
+                ans.textContent = "Error: " + err.message;
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        function escapeHtml(s) {
+            return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+        document.getElementById("queryInput").addEventListener("keypress", (e) => {
+            if (e.key === "Enter") runRAG();
+        });
+    </script>
+</body>
+</html>

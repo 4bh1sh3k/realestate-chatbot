@@ -3,185 +3,537 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apex Horizon Realty | Luxury & Modern Properties</title>
-    <!-- Google Fonts for premium typography -->
+    <title>Estatic — Real Estate RAG Chatbot</title>
+    <!-- Modern Google Fonts: Outfit (Headings/Logo) & Inter (Body) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome for icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom Stylesheet -->
-    <link rel="stylesheet" href="widget.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800;900&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg-black: #000000;
+            --text-white: #ffffff;
+            --text-muted: #8e95a5;
+            --pill-border: rgba(255, 255, 255, 0.16);
+            --brand-font: 'Outfit', sans-serif;
+            --body-font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --code-font: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-black);
+            color: var(--text-white);
+            font-family: var(--body-font);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Perspective Grid Background */
+        .grid-background {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 1300px;
+            height: 650px;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+            background-size: 55px 55px;
+            mask-image: radial-gradient(ellipse 65% 55% at 50% 35%, black 25%, transparent 80%);
+            -webkit-mask-image: radial-gradient(ellipse 65% 55% at 50% 35%, black 25%, transparent 80%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Ambient spotlight */
+        .ambient-spotlight {
+            position: absolute;
+            top: 15%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.06) 0%, transparent 70%);
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        /* Main Page Layout Container */
+        .page-container {
+            width: 100%;
+            max-width: 1320px;
+            padding: 16px 24px 140px;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Top Tech Stack Bar: 75% Width, Centered (12.5% on left and right) */
+        .top-tech-bar {
+            width: 75%;
+            margin: 14px auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 28px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            box-shadow: 
+                0 0 16px rgba(255, 255, 255, 0.04),
+                0 4px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .tech-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: #e5e7eb;
+            letter-spacing: -0.01em;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
+            transition: all 0.2s;
+        }
+
+        .tech-item:hover {
+            color: #ffffff;
+            text-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+        }
+
+        .tech-item i {
+            font-size: 0.92rem;
+            color: #e5e7eb;
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3));
+        }
+
+        .tech-separator {
+            color: rgba(255, 255, 255, 0.45);
+            font-size: 0.85rem;
+            text-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Hero Content: Pushed down comfortably */
+        .hero-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            max-width: 980px;
+            width: 100%;
+            margin-top: 70px;
+        }
+
+        /* Top Pill Badge */
+        .hero-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--pill-border);
+            padding: 6px 20px;
+            border-radius: 9999px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: #e5e7eb;
+            margin-bottom: 26px;
+            letter-spacing: -0.01em;
+        }
+
+        .pill-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        /* Main Headline */
+        .hero-headline {
+            font-family: var(--brand-font);
+            font-size: 4rem;
+            font-weight: 800;
+            letter-spacing: -0.035em;
+            line-height: 1.12;
+            margin-bottom: 20px;
+            color: #ffffff;
+            text-transform: uppercase;
+        }
+
+        .headline-gradient {
+            background: linear-gradient(180deg, #ffffff 35%, rgba(255, 255, 255, 0.4) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Subtitle */
+        .hero-subtitle {
+            font-size: 1.12rem;
+            color: var(--text-muted);
+            max-width: 680px;
+            line-height: 1.6;
+            margin-bottom: 34px;
+            font-weight: 400;
+        }
+
+        /* Centered Single Action Button: "Ask a Question" */
+        .cta-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .btn-launch {
+            background-color: #ffffff;
+            color: #000000;
+            font-family: var(--body-font);
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 14px 36px;
+            border-radius: 9999px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            transition: opacity 0.2s, transform 0.15s;
+        }
+
+        .btn-launch:hover {
+            opacity: 0.92;
+            transform: scale(1.02);
+        }
+
+        /* Search input bar */
+        .search-console {
+            width: 100%;
+            max-width: 680px;
+            background: rgba(18, 18, 22, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 9999px;
+            padding: 6px 8px 6px 22px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+            margin-bottom: 44px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .search-console:focus-within {
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
+        }
+
+        .search-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            font-size: 0.95rem;
+            font-family: var(--body-font);
+        }
+
+        .search-input::placeholder {
+            color: #6b7280;
+        }
+
+        .search-submit-btn {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 9999px;
+            padding: 10px 22px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: opacity 0.15s;
+        }
+
+        .search-submit-btn:hover {
+            opacity: 0.9;
+        }
+
+        .search-submit-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Result Container */
+        .response-container {
+            width: 100%;
+            max-width: 820px;
+            display: none;
+            background: rgba(14, 14, 18, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 24px;
+            text-align: left;
+            margin-bottom: 50px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            font-size: 0.85rem;
+            color: #9ca3af;
+        }
+
+        .response-text {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #e5e7eb;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+        }
+
+        .chunks-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #9ca3af;
+            margin-bottom: 10px;
+        }
+
+        .chunk-box {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.78rem;
+            font-family: var(--code-font);
+            color: #cbd5e1;
+            margin-bottom: 8px;
+            white-space: pre-wrap;
+        }
+
+        .chunk-box.prop { border-left: 3px solid #a855f7; }
+        .chunk-box.kb { border-left: 3px solid #10b981; }
+
+        /* Subtle Tech Stack Row (Matches the original Sisyphus / Layers aesthetic) */
+        .tech-logos {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 48px;
+            flex-wrap: wrap;
+            opacity: 0.38;
+            transition: opacity 0.3s;
+        }
+
+        .tech-logos:hover {
+            opacity: 0.75;
+        }
+
+        .tech-item {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: -0.01em;
+        }
+
+        .tech-item i {
+            font-size: 1rem;
+        }
+
+        /* Bottom Glowing Planet Horizon Arc */
+        .bottom-planet-arc {
+            position: fixed;
+            bottom: -220px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1400px;
+            height: 380px;
+            border-radius: 50% / 100% 100% 0 0;
+            background: #000000;
+            box-shadow: 
+                0 -4px 30px rgba(255, 255, 255, 0.45),
+                0 -12px 60px rgba(255, 255, 255, 0.25),
+                0 -35px 120px rgba(255, 255, 255, 0.12);
+            border-top: 1.5px solid rgba(255, 255, 255, 0.85);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            .hero-headline {
+                font-size: 2.4rem;
+            }
+            .tech-logos {
+                gap: 24px;
+            }
+        }
+    </style>
 </head>
 <body>
+    <!-- Subtle Grid Background & Ambient Lighting -->
+    <div class="grid-background"></div>
+    <div class="ambient-spotlight"></div>
 
-    <!-- 1. Header & Navigation -->
-    <header class="navbar">
-        <div class="nav-container">
-            <a href="#" class="nav-logo">
-                <i class="fa-solid fa-hotel logo-icon"></i>
-                <span>Apex Horizon</span>
-            </a>
-            <nav class="nav-menu">
-                <a href="#listings" class="nav-link">Properties</a>
-                <a href="#about" class="nav-link">About Us</a>
-                <a href="#services" class="nav-link">Services</a>
-                <a href="#contact" class="nav-link">Contact</a>
-            </nav>
-            <button class="nav-cta" onclick="toggleChat(true)">
-                <i class="fa-solid fa-comments"></i> Ask Assistant
-            </button>
-        </div>
-    </header>
-
-    <!-- 2. Hero Section -->
-    <section class="hero-section">
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <span class="hero-tag">Welcome to Apex Horizon Realty</span>
-            <h1 class="hero-title">Find a home where your story begins.</h1>
-            <p class="hero-subtitle">Discover premium listings in exclusive neighborhoods. Ask our AI Assistant for recommendations in real-time.</p>
-            
-            <!-- Hero Search bar - Integrated with AI Chatbot! -->
-            <div class="search-bar-container">
-                <div class="search-input-wrapper">
-                    <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                    <input type="text" id="heroSearchInput" placeholder="Try asking: 'Show me 3-bedroom houses near schools under $500k'...">
-                </div>
-                <button class="search-btn" id="heroSearchBtn">Ask AI</button>
-            </div>
-        </div>
-    </section>
-
-    <!-- 3. Featured Property Listings -->
-    <section class="listings-section" id="listings">
-        <div class="section-header">
-            <span class="section-tag">Current Inventory</span>
-            <h2 class="section-title">Featured Property Listings</h2>
-            <div class="accent-line"></div>
+    <div class="page-container">
+        <!-- Top Tech Stack Bar: Spans 75% centered with 12.5% margin on both sides -->
+        <div class="top-tech-bar">
+            <div class="tech-item"><i class="fa-solid fa-bolt"></i> <span>FastAPI</span></div>
+            <span class="tech-separator">•</span>
+            <div class="tech-item"><i class="fa-solid fa-database"></i> <span>ChromaDB</span></div>
+            <span class="tech-separator">•</span>
+            <div class="tech-item"><i class="fa-brands fa-google"></i> <span>Google Gemini</span></div>
+            <span class="tech-separator">•</span>
+            <div class="tech-item"><i class="fa-brands fa-python"></i> <span>Python</span></div>
+            <span class="tech-separator">•</span>
+            <div class="tech-item"><i class="fa-solid fa-network-wired"></i> <span>Vector Search</span></div>
         </div>
 
-        <div class="listings-grid">
-            <!-- Property 1 -->
-            <div class="property-card">
-                <div class="property-image-placeholder prop-img-townhouse">
-                    <span class="badge-price">$450,000</span>
-                    <span class="badge-tag">Near Schools</span>
-                </div>
-                <div class="property-details">
-                    <h3 class="property-title">Modern 3-Bedroom Family Townhouse</h3>
-                    <p class="property-location"><i class="fa-solid fa-location-dot"></i> Oakwood Suburbs</p>
-                    <div class="property-features">
-                        <span><i class="fa-solid fa-bed"></i> 3 Beds</span>
-                        <span><i class="fa-solid fa-bath"></i> 2.5 Baths</span>
-                        <span><i class="fa-solid fa-house"></i> Townhouse</span>
-                    </div>
-                    <button class="card-btn" onclick="askAIChat('Tell me more about the Modern 3-Bedroom Family Townhouse in Oakwood Suburbs')">
-                        <i class="fa-solid fa-sparkles"></i> Ask AI About This
-                    </button>
-                </div>
+        <!-- Main Hero -->
+        <section class="hero-section">
+            <!-- Headline: ESTATIC - REAL ESTATE RAG CHATBOT -->
+            <h1 class="hero-headline">
+                Estatic — <span class="headline-gradient">Real Estate RAG Chatbot</span>
+            </h1>
+
+            <!-- Subtitle: Balances visual weight -->
+            <p class="hero-subtitle">
+                Instant answers on property listings, pricing, HOA rules, and loans—grounded in real-time vector memory.
+            </p>
+
+            <!-- Centered Action Button: Ask a Question -->
+            <div class="cta-group">
+                <button class="btn-launch" onclick="focusSearch()">Ask a Question</button>
             </div>
 
-            <!-- Property 2 -->
-            <div class="property-card">
-                <div class="property-image-placeholder prop-img-villa">
-                    <span class="badge-price">$1,250,000</span>
-                    <span class="badge-tag">Ocean View</span>
-                </div>
-                <div class="property-details">
-                    <h3 class="property-title">Luxury 4-Bedroom Villa with Ocean View</h3>
-                    <p class="property-location"><i class="fa-solid fa-location-dot"></i> Sunset Cliff, Coastal Heights</p>
-                    <div class="property-features">
-                        <span><i class="fa-solid fa-bed"></i> 4 Beds</span>
-                        <span><i class="fa-solid fa-bath"></i> 4.5 Baths</span>
-                        <span><i class="fa-solid fa-swimming-pool"></i> Infinity Pool</span>
-                    </div>
-                    <button class="card-btn" onclick="askAIChat('Can you describe the Luxury 4-Bedroom Villa with Ocean View?')">
-                        <i class="fa-solid fa-sparkles"></i> Ask AI About This
-                    </button>
-                </div>
-            </div>
-
-            <!-- Property 3 -->
-            <div class="property-card">
-                <div class="property-image-placeholder prop-img-loft">
-                    <span class="badge-price">$280,000</span>
-                    <span class="badge-tag">Downtown</span>
-                </div>
-                <div class="property-details">
-                    <h3 class="property-title">Cozy 1-Bedroom Downtown Loft</h3>
-                    <p class="property-location"><i class="fa-solid fa-location-dot"></i> Downtown Metro District</p>
-                    <div class="property-features">
-                        <span><i class="fa-solid fa-bed"></i> 1 Bed</span>
-                        <span><i class="fa-solid fa-bath"></i> 1.0 Bath</span>
-                        <span><i class="fa-solid fa-train"></i> Transit Near</span>
-                    </div>
-                    <button class="card-btn" onclick="askAIChat('What features does the Cozy 1-Bedroom Downtown Loft have?')">
-                        <i class="fa-solid fa-sparkles"></i> Ask AI About This
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 4. RAG Chatbot Widget Interface -->
-    <!-- Floating Chat Trigger Button -->
-    <button class="chat-trigger-btn" id="chatTrigger" onclick="toggleChat()">
-        <span class="pulse-ring"></span>
-        <i class="fa-solid fa-comment-dots text-icon"></i>
-        <i class="fa-solid fa-xmark close-icon hidden"></i>
-        <span class="notification-badge">1</span>
-    </button>
-
-    <!-- Chat Drawer Panel -->
-    <div class="chat-drawer" id="chatDrawer">
-        <!-- Chat Header -->
-        <div class="chat-header">
-            <div class="chat-agent-info">
-                <div class="agent-avatar">
-                    <i class="fa-solid fa-robot"></i>
-                    <span class="status-dot online"></span>
-                </div>
-                <div class="agent-text">
-                    <h4>Apex Horizon Concierge</h4>
-                    <p>AI RAG Search Assistant</p>
-                </div>
-            </div>
-            <button class="chat-close-btn" onclick="toggleChat(false)">
-                <i class="fa-solid fa-minus"></i>
-            </button>
-        </div>
-
-        <!-- Chat Output Messages Feed -->
-        <div class="chat-messages" id="chatMessages">
-            <div class="msg-bubble bot">
-                <div class="message-content">
-                    <p>Hello! I am your AI assistant. I can search our active property database and answer questions about locations, pricing, features, or buying rules. How can I help you find your dream home today?</p>
-                </div>
-                <span class="msg-timestamp">Just now</span>
-            </div>
-        </div>
-
-        <!-- Suggestion Chips (Predefined Queries) -->
-        <div class="suggestion-chips" id="suggestionChips">
-            <button class="chip" onclick="askAIChat('Show me 3-bedroom family townhouses')">🏡 3-Bed Townhouse</button>
-            <button class="chip" onclick="askAIChat('Do you have properties with pools or ocean views?')">🌊 Ocean View & Pool</button>
-            <button class="chip" onclick="askAIChat('Are there any listings under $300,000?')">💰 Under $300k</button>
-            <button class="chip" onclick="askAIChat('I want a quiet cottage with a large backyard')">🌳 Cottage with Yard</button>
-        </div>
-
-        <!-- Chat Input Form -->
-        <div class="chat-input-area">
-            <form id="chatForm" onsubmit="handleChatSubmit(event)">
-                <input type="text" id="chatInputField" placeholder="Type a message..." autocomplete="off">
-                <button type="submit" class="chat-send-btn" id="chatSendBtn">
-                    <i class="fa-solid fa-paper-plane"></i>
+            <!-- Integrated Search Console -->
+            <div class="search-console">
+                <i class="fa-solid fa-sparkles" style="color: #6b7280; font-size: 0.9rem;"></i>
+                <input type="text" id="ragQueryInput" class="search-input" placeholder="Type your housing question here..." autocomplete="off">
+                <button class="search-submit-btn" id="submitQueryBtn" onclick="executeRAG()">
+                    <span id="btnText">Search</span>
+                    <i class="fa-solid fa-arrow-right" style="font-size: 0.75rem;"></i>
                 </button>
-            </form>
-        </div>
+            </div>
+
+            <!-- Expandable Response Container -->
+            <div class="response-container" id="responseBox">
+                <div class="response-header">
+                    <span><i class="fa-solid fa-robot" style="margin-right: 6px;"></i> Response</span>
+                    <span id="latencyTag">Gemini-2.5-Flash</span>
+                </div>
+                <div class="response-text" id="answerDisplay"></div>
+                
+                <div class="chunks-title"><i class="fa-solid fa-database" style="margin-right: 6px;"></i> Retrieved Context Chunks</div>
+                <div id="chunksDisplay"></div>
+            </div>
+        </section>
     </div>
 
-    <!-- Custom Javascript Widget Logic -->
-    <script src="widget.js"></script>
+    <!-- Glowing Planetary Horizon Arc at Bottom -->
+    <div class="bottom-planet-arc"></div>
+
+    <script>
+        const BACKEND_URL = "http://127.0.0.1:8000";
+
+        function focusSearch() {
+            const input = document.getElementById("ragQueryInput");
+            input.focus();
+            input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        async function executeRAG() {
+            const input = document.getElementById("ragQueryInput");
+            const query = input.value.trim();
+            if (!query) return;
+
+            const btn = document.getElementById("submitQueryBtn");
+            const btnText = document.getElementById("btnText");
+            const resBox = document.getElementById("responseBox");
+            const answerDisplay = document.getElementById("answerDisplay");
+            const chunksDisplay = document.getElementById("chunksDisplay");
+            const latencyTag = document.getElementById("latencyTag");
+
+            btn.disabled = true;
+            btnText.textContent = "Searching...";
+            resBox.style.display = "block";
+            answerDisplay.innerHTML = `<span style="color:#9ca3af; font-style: italic;"><i class="fa-solid fa-circle-notch fa-spin"></i> Retrieving & generating...</span>`;
+            chunksDisplay.innerHTML = "";
+
+            const startTime = performance.now();
+
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/chat`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query: query })
+                });
+
+                if (!res.ok) throw new Error(`HTTP Error ${res.status}`);
+
+                const data = await res.json();
+                const latency = Math.round(performance.now() - startTime);
+
+                latencyTag.textContent = `${latency}ms`;
+                answerDisplay.textContent = data.answer;
+
+                const props = data.retrieved_context.properties || [];
+                const kb = data.retrieved_context.knowledge_chunks || [];
+
+                let chunksHtml = "";
+                props.forEach((item, idx) => {
+                    chunksHtml += `
+                        <div class="chunk-box prop">
+                            <strong style="color: #c084fc;">[Property Listing #${idx + 1}]</strong>\n${escapeHtml(item)}
+                        </div>`;
+                });
+
+                kb.forEach((chunk, idx) => {
+                    chunksHtml += `
+                        <div class="chunk-box kb">
+                            <strong style="color: #34d399;">[Knowledge Base Chunk #${idx + 1}]</strong>\n${escapeHtml(chunk)}
+                        </div>`;
+                });
+
+                chunksDisplay.innerHTML = chunksHtml || `<div style="color: #6b7280;">No chunks matched.</div>`;
+
+            } catch (err) {
+                answerDisplay.innerHTML = `<span style="color:#ef4444;"><i class="fa-solid fa-circle-exclamation"></i> Error: ${err.message}. Ensure backend is running on port 8000.</span>`;
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = "Search";
+            }
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        document.getElementById("ragQueryInput").addEventListener("keypress", (e) => {
+            if (e.key === "Enter") executeRAG();
+        });
+    </script>
 </body>
 </html>
